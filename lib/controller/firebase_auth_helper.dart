@@ -1,10 +1,15 @@
-import 'package:chat_app_flutter_firebase/constants/widgtes.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:chat_app_flutter_firebase/utilities/titles.dart';
+import 'package:chat_app_flutter_firebase/utilities/widgtes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class FirebaseAuthHelper {
-  static List<Map> users = [];
+  static List users = [];
+  static int count = 0;
 
   static signUp({
     required BuildContext context,
@@ -13,23 +18,86 @@ class FirebaseAuthHelper {
     required String password,
   }) async {
     try {
+      // creating user in firebase auth
       UserCredential firebaseAuth = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
-      firebaseDatabase.ref('users').onValue.listen((event) {
-        users = event.snapshot.value as List<Map>;
-      });
+
+      // getting old data back to add new into it
+      var values = await firebaseDatabase.ref('users').get();
+      List data = values.value as List<dynamic>;
+      users = data.map((element) {
+        return {
+          'name': element['name'],
+          'email': element['email'],
+          'password': element['password'],
+          'uid': element['uid'],
+        };
+      }).toList();
+      // adding new data to the previous data
       users.add({
         'name': fullName,
         'email': email,
         'uid': firebaseAuth.user!.uid,
         'password': password
       });
-      firebaseDatabase.ref("users").set(users);
+
+      // upload new data to firebase realtime database
+      await firebaseDatabase.ref("users").set(users);
+
+      // save login info to local database hive
+      Box localDB = Hive.box(userLoginInfoSaveKey);
+      localDB.put('name', fullName);
+      localDB.put('uid', firebaseAuth.user!.uid);
+      localDB.put('email', email);
+      localDB.put('password', password);
+
+      //show signUp success message to user
       ScaffoldMessenger.of(context).showSnackBar(snackBar(
           mesej: "User Sign Up successful ...",
           bgColor: Colors.green,
           showCloseButton: true));
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar(
+          mesej: e.message!, bgColor: Colors.red, showCloseButton: true));
+    }
+  }
+
+  static signIn({
+    required BuildContext context,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      // creating user in firebase auth
+      UserCredential firebaseAuth = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
+
+      // getting old data back to add new into it
+      var values = await firebaseDatabase.ref('users').get();
+      List data = values.value as List<dynamic>;
+      users = data.map((element) {
+        return {
+          'name': element['name'],
+          'email': element['email'],
+          'password': element['password'],
+          'uid': element['uid'],
+        };
+      }).toList();
+
+      Box localDB = Hive.box(userLoginInfoSaveKey);
+
+      // save login info to local database hive
+
+      users.forEach((element) {
+        if (element['email'] == email && element['password'] == password) {
+          localDB.put('name', element['name']);
+          localDB.put('uid', element['uid']);
+          localDB.put('email', email);
+          localDB.put('password', password);
+        }
+      });
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar(
           mesej: e.message!, bgColor: Colors.red, showCloseButton: true));

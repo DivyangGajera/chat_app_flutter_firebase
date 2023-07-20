@@ -1,9 +1,18 @@
 // ignore: file_names
 
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 class ThemeManager extends ChangeNotifier {
   ThemeMode _currentTheme = ThemeMode.system;
+  int _themeNo = 1;
+
+  int get getThemeNo => _themeNo;
+  set setThemeNo(int newNo) {
+    _themeNo = newNo;
+    notifyListeners();
+  }
 
   bool get isLightTheme => _currentTheme == ThemeMode.light ? true : false;
 
@@ -22,13 +31,21 @@ OutlineInputBorder border({required Color borderColor}) => OutlineInputBorder(
 
 class Themes {
   static ThemeData lightTheme = ThemeData(
-      appBarTheme: AppBarTheme(backgroundColor: Colors.blue),
+      appBarTheme: const AppBarTheme(backgroundColor: Colors.blue),
       brightness: Brightness.light,
+      pageTransitionsTheme: PageTransitionsTheme(builders: {
+        TargetPlatform.android: CupertinoPageTransitionsBuilder()
+      }),
       colorScheme: const ColorScheme.light(),
       elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, fixedSize: Size(138, 45))),
+              backgroundColor: Colors.blue, fixedSize: const Size(138, 45))),
       useMaterial3: false,
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 3,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         filled: true,
@@ -45,6 +62,9 @@ class Themes {
               backgroundColor: Colors.blue, fixedSize: Size(138, 45))),
       primaryColor: Colors.white,
       useMaterial3: false,
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Colors.blue,
+          extendedTextStyle: TextStyle(fontSize: 17, color: Colors.white)),
       inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         filled: true,

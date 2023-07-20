@@ -7,6 +7,7 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
+  badges: ^3.1.1
   email_validator: ^2.1.17
   firebase_auth: ^4.7.1
   firebase_core: ^2.15.0
@@ -14,6 +15,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_pw_validator: ^1.6.0
+  hive: ^2.2.3
+  path_provider: ^2.0.15
   provider: ^6.0.5
 
 dev_dependencies:
@@ -23,3 +26,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

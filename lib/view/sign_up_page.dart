@@ -1,13 +1,14 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
-import 'package:chat_app_flutter_firebase/constants/titles.dart';
+import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:chat_app_flutter_firebase/controller/firebase_auth_helper.dart';
+import 'package:chat_app_flutter_firebase/utilities/widgtes.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:provider/provider.dart';
 
-import '../constants/sign_up_page_constants.dart';
+import '../utilities/sign_up_page_variables.dart';
 
 class SignUp extends StatelessWidget {
   TextEditingController passwordController = TextEditingController();
@@ -141,6 +142,12 @@ class SignUp extends StatelessWidget {
                             emailController.clear();
                             passwordController.clear();
                             fullnameController.clear();
+                            Future.delayed(Duration(seconds: 2));
+                            Navigator.pushReplacementNamed(context, '/chats');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar(
+                                mesej: 'Please fill every details',
+                                bgColor: Colors.red));
                           }
                         },
                         child: const Text(
@@ -158,7 +165,8 @@ class SignUp extends StatelessWidget {
                           style: TextStyle(color: Colors.black, fontSize: 15),
                         ),
                         GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, "/sign_in"),
+                          onTap: () => Navigator.pushReplacementNamed(
+                              context, "/sign_in"),
                           child: const Text(
                             "Sign in",
                             style: TextStyle(color: Colors.blue, fontSize: 15),

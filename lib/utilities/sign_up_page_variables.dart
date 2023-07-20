@@ -11,6 +11,9 @@ class SignupPageVariables extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isSignupPassVisible => _signupPasswordVisible;
+  bool get isPasswordValidationVisible => _isPasswordValidationVisiblity;
+
   set updateEmailErrorString(bool isValid) {
     errorString = isValid ? "" : "Please enter a valid email Address";
     notifyListeners();
@@ -20,10 +23,6 @@ class SignupPageVariables extends ChangeNotifier {
     errorString = isValid ? "" : "Please enter the full name";
     notifyListeners();
   }
-
-  bool get isSignupPassVisible => _signupPasswordVisible;
-  bool get isPasswordValidationVisible => _isPasswordValidationVisiblity;
-
 
   set changeSignupPassVisibility(bool change) {
     _signupPasswordVisible = change;

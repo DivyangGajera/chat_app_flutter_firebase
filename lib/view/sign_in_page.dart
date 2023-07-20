@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:chat_app_flutter_firebase/constants/sign_in_page_constants.dart';
-import 'package:chat_app_flutter_firebase/constants/titles.dart';
+import 'package:chat_app_flutter_firebase/utilities/sign_in_page_variables.dart';
+import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -87,14 +87,12 @@ class SignIn extends StatelessWidget {
                     const SizedBox(
                       height: 40,
                     ),
-                    Visibility(
-                      visible: !value.isPasswordValidationVisible,
-                      child: const SizedBox(
-                        height: 100,
-                      ),
+                    const SizedBox(
+                      height: 150,
                     ),
                     ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () =>
+                            Navigator.pushReplacementNamed(context, "/chats"),
                         child: const Text(
                           "Sign In Now",
                           style: TextStyle(fontSize: 18),
@@ -110,6 +108,8 @@ class SignIn extends StatelessWidget {
                           style: TextStyle(color: Colors.black, fontSize: 15),
                         ),
                         GestureDetector(
+                          onTap: () => Navigator.pushReplacementNamed(
+                              context, "/sign_up"),
                           child: const Text(
                             "Sign up",
                             style: TextStyle(color: Colors.blue, fontSize: 15),
