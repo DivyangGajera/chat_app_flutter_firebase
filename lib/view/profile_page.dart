@@ -1,9 +1,13 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badge;
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  ProfilePage({required this.name, required this.email, super.key});
+
+  String name, email;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +36,7 @@ class ProfilePage extends StatelessWidget {
               size: 250,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 70,
           ),
           Row(
@@ -55,7 +59,7 @@ class ProfilePage extends StatelessWidget {
                   color: Colors.blue,
                 )),
             title: Text(
-              "Your Name here",
+              name,
               style: drawerHeaderStyle,
             ),
             subtitle: const Text(
@@ -85,7 +89,7 @@ class ProfilePage extends StatelessWidget {
               style: Theme.of(context).textTheme.subtitle1,
             ),
             subtitle: Text(
-              "Your E-mail here",
+              email,
               style: drawerHeaderStyle,
             ),
           ),

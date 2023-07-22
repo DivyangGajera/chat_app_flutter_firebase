@@ -63,7 +63,7 @@ class FirebaseAuthHelper {
     }
   }
 
-  static signIn({
+  static Future<List> signIn({
     required BuildContext context,
     required String email,
     required String password,
@@ -89,18 +89,20 @@ class FirebaseAuthHelper {
       Box localDB = Hive.box(userLoginInfoSaveKey);
 
       // save login info to local database hive
-
-      users.forEach((element) {
-        if (element['email'] == email && element['password'] == password) {
+      for (var element in users) {
+        if (element['email'] == email) {
           localDB.put('name', element['name']);
-          localDB.put('uid', element['uid']);
+          localDB.put('uid', firebaseAuth.user!.uid);
           localDB.put('email', email);
           localDB.put('password', password);
+          print('darta satored');
         }
-      });
+      }
+      return [true, ''];
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(snackBar(
-          mesej: e.message!, bgColor: Colors.red, showCloseButton: true));
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar(
+      //     mesej: e.message!, bgColor: Colors.red, showCloseButton: true));
+      return [false, e.message];
     }
   }
 }

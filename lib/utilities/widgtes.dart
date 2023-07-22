@@ -1,5 +1,6 @@
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 SnackBar snackBar(
         {required String? mesej,
@@ -12,6 +13,55 @@ SnackBar snackBar(
       dismissDirection: DismissDirection.horizontal,
       backgroundColor: bgColor,
     );
+
+class SignOutDialogue extends StatelessWidget {
+  const SignOutDialogue({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Theme.of(context).secondaryHeaderColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      title: Text(
+        "Are you sure you want to Sign out ?",
+        style: TextStyle(fontSize: 20),
+      ),
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      actions: [
+        OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Hive.box(userLoginInfoSaveKey).clear();
+              Navigator.pushReplacementNamed(context, '/sign_up');
+            },
+            style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Colors.black),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50)),
+                backgroundColor: Colors.white),
+            child: Text(
+              "Yes",
+              style: TextStyle(fontSize: 17, color: Colors.red),
+            )),
+        OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Colors.black),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50)),
+                backgroundColor: Colors.white),
+            child: Text(
+              "No",
+              style: TextStyle(fontSize: 17, color: Colors.green),
+            )),
+      ],
+    );
+  }
+}
 
 Widget chatMesej({required String mesej, required bool sendedByMe}) {
   return Padding(
@@ -47,4 +97,78 @@ Widget chatMesej({required String mesej, required bool sendedByMe}) {
       ],
     ),
   );
+}
+
+class ChatScreenNavigationDrawer extends StatelessWidget {
+  const ChatScreenNavigationDrawer({
+    super.key,
+    required this.name,
+    required this.email,
+  });
+
+  final String name;
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigationDrawer(children: [
+      Container(
+        alignment: Alignment.bottomLeft,
+        height: 200,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/images/account_card.png'),
+              fit: BoxFit.fitHeight),
+          color: Colors.blue,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            name,
+            style: drawerHeaderStyle,
+          ),
+        ),
+      ),
+      Divider(),
+      ListTile(
+        onTap: () => Navigator.popAndPushNamed(context, '/profile',
+            arguments: {'email': email, 'name': name}),
+        trailing: Icon(Icons.account_circle),
+        title: Text("Profile"),
+      ),
+      Divider(),
+      ListTile(
+        onTap: () => Navigator.popAndPushNamed(context, '/themes'),
+        trailing: Icon(Icons.format_paint),
+        title: Text("Themes"),
+      ),
+      Divider(),
+      ListTile(
+        onTap: () => Navigator.popAndPushNamed(context, '/licenses'),
+        trailing: Icon(Icons.receipt),
+        title: Text("Licenses"),
+      ),
+      Divider(),
+      ListTile(
+        onTap: () => Navigator.popAndPushNamed(context, '/about_us'),
+        trailing: Icon(Icons.info),
+        title: Text("About Us"),
+      ),
+      Divider(),
+      ListTile(
+        onTap: () {
+          var size = MediaQuery.sizeOf(context);
+          Navigator.pop(context);
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => SignOutDialogue(),
+          );
+        },
+        trailing: Icon(Icons.exit_to_app),
+        title: Text("Sign Out"),
+      ),
+      Divider(),
+    ]);
+  }
 }

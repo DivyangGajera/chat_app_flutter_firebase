@@ -1,76 +1,79 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:chat_app_flutter_firebase/model/user_model.dart';
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:flutter/material.dart';
 
-class Chats extends StatelessWidget {
-  const Chats({super.key});
+import 'package:hive/hive.dart';
 
-  // showLicensePage(
-  //                     context: context,
-  //                     applicationName: "My Chat App",
-  //                     useRootNavigator: true,
-  //                     applicationVersion: "1.0.0",
-  //                     applicationIcon: Icon(Icons.chat));
+import '../utilities/widgtes.dart';
+
+class Chats extends StatefulWidget {
+  Chats({super.key, required this.ls});
+  List<User> ls;
+
+  @override
+  State<Chats> createState() => _ChatsState();
+}
+
+class _ChatsState extends State<Chats> {
+  List<User> chat_persons = [];
+  String name = '';
+  String password = '';
+  String email = '';
+  String uid = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loader();
+  }
+
+  loader() async {
+    Box loginInfo = Hive.box(userLoginInfoSaveKey);
+    name = loginInfo.get('name');
+    password = loginInfo.get('password');
+    email = loginInfo.get('email');
+    uid = loginInfo.get('uid');
+
+    widget.ls.forEach((element) {
+      // print(element.name);
+      if (element.email == email) {
+        // print(element.chat_persons);
+        for (var i = 0; i < element.chat_persons.length; i++) {
+          // print("from chat persons : " + element.chat_persons[i]);
+          // print("from db : " + widget.ls[i].name);
+          widget.ls.forEach((element1) {
+            if (element.chat_persons[i] == element1.name) {
+              // print("object = ${element.chat_persons[i] == element1.name}");
+              chat_persons.add(element1);
+            }
+          });
+        }
+
+        // widget.ls.remove(element);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavigationDrawer(children: [
-        Container(
-          alignment: Alignment.bottomLeft,
-          height: 200,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/account_card.png'),
-                fit: BoxFit.fitHeight),
-            color: Colors.blue,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "My name Here",
-              style: drawerHeaderStyle,
-            ),
-          ),
-        ),
-        Divider(),
-        ListTile(
-          onTap: () => Navigator.popAndPushNamed(context, '/profile'),
-          trailing: Icon(Icons.account_circle),
-          title: Text("Profile"),
-        ),
-        Divider(),
-        ListTile(
-          onTap: () => Navigator.popAndPushNamed(context, '/themes'),
-          trailing: Icon(Icons.format_paint),
-          title: Text("Themes"),
-        ),
-        Divider(),
-        ListTile(
-          onTap: () => Navigator.popAndPushNamed(context, '/licenses'),
-          trailing: Icon(Icons.receipt),
-          title: Text("Licenses"),
-        ),
-        Divider(),
-        ListTile(
-          onTap: () => Navigator.popAndPushNamed(context, '/about_us'),
-          trailing: Icon(Icons.info),
-          title: Text("About Us"),
-        ),
-        Divider(),
-        ListTile(
-          onTap: () {},
-          trailing: Icon(Icons.exit_to_app),
-          title: Text("Sign Out"),
-        ),
-        Divider(),
-      ]),
+      drawer: ChatScreenNavigationDrawer(name: name, email: email),
       floatingActionButton: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50))),
-        onPressed: () => Navigator.pushNamed(context, "/make_new_chat"),
+        onPressed: () {
+          List<User> send = [];
+          widget.ls.forEach((element) {
+            if (element.email != email) {
+              send.add(element);
+            }
+          });
+          Navigator.pushNamed(context, "/make_new_chat",
+              arguments: {'userData': send});
+        },
         label: Text(chatsFABText),
         icon: const Icon(Icons.chat),
       ),
@@ -86,14 +89,14 @@ class Chats extends StatelessWidget {
             itemBuilder: (context, index) {
               return ListTile(
                 onTap: () => Navigator.pushNamed(context, "/show_messages",
-                    arguments: {'user': "user $index"}),
-                title: Text("user $index"),
-                subtitle: Text("user$index@gmail.com"),
+                    arguments: {'user': chat_persons[index].name}),
+                title: Text(chat_persons[index].name),
+                subtitle: Text(chat_persons[index].email),
                 leading: const Icon(Icons.account_circle_outlined),
               );
             },
             separatorBuilder: (context, index) => const Divider(),
-            itemCount: 20),
+            itemCount: chat_persons.length),
       ),
     );
   }

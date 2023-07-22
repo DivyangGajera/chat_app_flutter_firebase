@@ -6,8 +6,22 @@ class SigninPageVariables extends ChangeNotifier {
 
   String errorString = "";
 
+  bool _loading = false;
+
+  get isLoading => _loading;
+
+  set changeLoadingState(bool state) {
+    _loading = state;
+    notifyListeners();
+  }
+
   get changePasswordValidationVisiblity {
     _isPasswordValidationVisiblity = true;
+    notifyListeners();
+  }
+
+  set setErrorString(String mesej) {
+    errorString = mesej;
     notifyListeners();
   }
 
@@ -33,6 +47,4 @@ class SigninPageVariables extends ChangeNotifier {
     _signinPasswordVisible = change;
     notifyListeners();
   }
-
-  
 }

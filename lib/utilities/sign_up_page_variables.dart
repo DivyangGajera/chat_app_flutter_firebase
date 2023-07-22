@@ -6,6 +6,15 @@ class SignupPageVariables extends ChangeNotifier {
 
   String errorString = "";
 
+  bool _loading = false;
+
+  get isLoading => _loading;
+
+  set changeLoadingState(bool state) {
+    _loading = state;
+    notifyListeners();
+  }
+
   get changePasswordValidationVisiblity {
     _isPasswordValidationVisiblity = true;
     notifyListeners();
