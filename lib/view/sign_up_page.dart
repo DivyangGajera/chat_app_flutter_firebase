@@ -2,7 +2,7 @@
 
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:chat_app_flutter_firebase/controller/firebase_auth_helper.dart';
-import 'package:chat_app_flutter_firebase/utilities/widgtes.dart';
+import 'package:chat_app_flutter_firebase/utilities/widgets.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
@@ -148,7 +148,7 @@ class SignUp extends StatelessWidget {
                               emailController.clear();
                               passwordController.clear();
                               fullnameController.clear();
-                              Future.delayed(Duration(seconds: 2));
+                              Future.delayed(const Duration(seconds: 2));
                               Navigator.pushReplacementNamed(
                                   context, '/sign_in');
                             } else {

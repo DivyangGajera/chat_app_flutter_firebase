@@ -111,7 +111,6 @@ class SignIn extends StatelessWidget {
                                     context, "/chats",arguments: {'userData': ls}),
                               );
                             } else {
-                              // TODO
                               value.changeLoadingState = false;
                               value.setErrorString = loginInfo[1];
                             }

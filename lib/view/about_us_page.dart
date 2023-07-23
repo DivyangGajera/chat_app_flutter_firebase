@@ -19,7 +19,7 @@ class AboutUsPage extends StatelessWidget {
           ),
           Text(
             "\nVersion 1.0.0",
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           const Divider(
             color: Colors.transparent,

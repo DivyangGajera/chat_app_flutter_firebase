@@ -1,4 +1,4 @@
-import 'package:chat_app_flutter_firebase/utilities/show_messages_page_variables.dart';
+import 'package:chat_app_flutter_firebase/utilities/profile_page_variables.dart';
 import 'package:chat_app_flutter_firebase/view/about_us_page.dart';
 import 'package:chat_app_flutter_firebase/view/change_themes_page.dart';
 import 'package:chat_app_flutter_firebase/view/chats_page.dart';
@@ -49,17 +49,24 @@ class RoutesManager {
         Map data = settings.arguments as Map;
 
         return MaterialPageRoute(
-          builder: (context) => ChangeNotifierProvider(
-            create: (context) => SigninPageVariables(),
-            builder: (context, child) => MakeNewChat(ls: data['userData']),
+          builder: (context) => ShowMessages(
+            user: data['user'],
+            newChat: data['newChat'] ?? false,
           ),
         );
+      // return MaterialPageRoute(
+      //   builder: (context) => ChangeNotifierProvider(
+      //     create: (context) => SigninPageVariables(),
+      //     builder: (context, child) => MakeNewChat(ls: data['userData']),
+      //   ),
+      // );
 
       case '/show_messages':
         Map arguments = settings.arguments as Map;
         return MaterialPageRoute(
           builder: (context) => ShowMessages(
             user: arguments['user'],
+            newChat: arguments['newChat'] ?? false,
           ),
         );
 
@@ -89,8 +96,7 @@ class RoutesManager {
       case '/profile':
         Map args = settings.arguments as Map;
         return MaterialPageRoute(
-          builder: (context) =>
-              ProfilePage(email: args['email'], name: args['name']),
+          builder: (context) => ProfilePage(email: args['email'], name: args['name']),
         );
       default:
         return null;

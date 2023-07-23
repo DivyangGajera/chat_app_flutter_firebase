@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
-import 'package:chat_app_flutter_firebase/utilities/widgtes.dart';
+import 'package:chat_app_flutter_firebase/utilities/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +95,7 @@ class FirebaseAuthHelper {
           localDB.put('uid', firebaseAuth.user!.uid);
           localDB.put('email', email);
           localDB.put('password', password);
-          print('darta satored');
+          debugPrint('data stored');
         }
       }
       return [true, ''];

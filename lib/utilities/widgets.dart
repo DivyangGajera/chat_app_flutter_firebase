@@ -24,7 +24,7 @@ class SignOutDialogue extends StatelessWidget {
     return AlertDialog(
       backgroundColor: Theme.of(context).secondaryHeaderColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      title: Text(
+      title: const Text(
         "Are you sure you want to Sign out ?",
         style: TextStyle(fontSize: 20),
       ),
@@ -37,11 +37,11 @@ class SignOutDialogue extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/sign_up');
             },
             style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Colors.black),
+                side: const BorderSide(color: Colors.black),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50)),
                 backgroundColor: Colors.white),
-            child: Text(
+            child: const Text(
               "Yes",
               style: TextStyle(fontSize: 17, color: Colors.red),
             )),
@@ -50,11 +50,11 @@ class SignOutDialogue extends StatelessWidget {
               Navigator.pop(context);
             },
             style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Colors.black),
+                side: const BorderSide(color: Colors.black),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50)),
                 backgroundColor: Colors.white),
-            child: Text(
+            child: const Text(
               "No",
               style: TextStyle(fontSize: 17, color: Colors.green),
             )),
@@ -63,7 +63,8 @@ class SignOutDialogue extends StatelessWidget {
   }
 }
 
-Widget chatMesej({required String mesej, required bool sendedByMe}) {
+Widget chatMesej(
+    {required String mesej, required bool sendedByMe, required String time}) {
   return Padding(
     padding: const EdgeInsets.all(4.0),
     child: Row(
@@ -88,9 +89,11 @@ Widget chatMesej({required String mesej, required bool sendedByMe}) {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(
-              mesej,
-              style: messageStyle,
+            child: Flexible(
+              child: Text(
+                mesej,
+                style: messageStyle,
+              ),
             ),
           ),
         ),
@@ -115,7 +118,7 @@ class ChatScreenNavigationDrawer extends StatelessWidget {
       Container(
         alignment: Alignment.bottomLeft,
         height: 200,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage('assets/images/account_card.png'),
               fit: BoxFit.fitHeight),
@@ -129,46 +132,45 @@ class ChatScreenNavigationDrawer extends StatelessWidget {
           ),
         ),
       ),
-      Divider(),
+      const Divider(),
       ListTile(
         onTap: () => Navigator.popAndPushNamed(context, '/profile',
             arguments: {'email': email, 'name': name}),
-        trailing: Icon(Icons.account_circle),
-        title: Text("Profile"),
+        trailing: const Icon(Icons.account_circle),
+        title: const Text("Profile"),
       ),
-      Divider(),
+      const Divider(),
       ListTile(
         onTap: () => Navigator.popAndPushNamed(context, '/themes'),
-        trailing: Icon(Icons.format_paint),
-        title: Text("Themes"),
+        trailing: const Icon(Icons.format_paint),
+        title: const Text("Themes"),
       ),
-      Divider(),
+      const Divider(),
       ListTile(
         onTap: () => Navigator.popAndPushNamed(context, '/licenses'),
-        trailing: Icon(Icons.receipt),
-        title: Text("Licenses"),
+        trailing: const Icon(Icons.receipt),
+        title: const Text("Licenses"),
       ),
-      Divider(),
+      const Divider(),
       ListTile(
         onTap: () => Navigator.popAndPushNamed(context, '/about_us'),
-        trailing: Icon(Icons.info),
-        title: Text("About Us"),
+        trailing: const Icon(Icons.info),
+        title: const Text("About Us"),
       ),
-      Divider(),
+      const Divider(),
       ListTile(
         onTap: () {
-          var size = MediaQuery.sizeOf(context);
           Navigator.pop(context);
           showDialog(
             barrierDismissible: false,
             context: context,
-            builder: (context) => SignOutDialogue(),
+            builder: (context) => const SignOutDialogue(),
           );
         },
-        trailing: Icon(Icons.exit_to_app),
-        title: Text("Sign Out"),
+        trailing: const Icon(Icons.exit_to_app),
+        title: const Text("Sign Out"),
       ),
-      Divider(),
+      const Divider(),
     ]);
   }
 }

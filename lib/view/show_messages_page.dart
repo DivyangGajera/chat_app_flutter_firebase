@@ -4,7 +4,6 @@ import 'package:chat_app_flutter_firebase/controller/messages_controller.dart';
 import 'package:chat_app_flutter_firebase/model/mesaage_model.dart';
 import 'package:chat_app_flutter_firebase/utilities/show_messages_page_variables.dart';
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
-import 'package:chat_app_flutter_firebase/utilities/widgtes.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -12,84 +11,95 @@ import 'package:provider/provider.dart';
 
 class ShowMessages extends StatefulWidget {
   String user;
+  bool newChat;
 
-  ShowMessages({required this.user, super.key});
+  ShowMessages({required this.user, super.key, this.newChat = false});
 
   @override
   State<ShowMessages> createState() => _ShowMessagesState();
 }
 
 class _ShowMessagesState extends State<ShowMessages> {
-  List<Widget> chatList = [
-    chatMesej(mesej: "HI !!", sendedByMe: true),
-    chatMesej(mesej: "Hello", sendedByMe: false),
-    chatMesej(mesej: "How are you ?", sendedByMe: true),
-    chatMesej(mesej: "I am fine, Thanks !", sendedByMe: false),
-    chatMesej(
-        mesej:
-            "I currently have a listened operating on the whole of my screen. I would like to have a button in the bottom of the screen",
-        sendedByMe: true),
-    chatMesej(
-        mesej:
-            "ListView is the most commonly used scrolling widget. It displays its children one after another in the scroll direction.",
-        sendedByMe: false),
-    chatMesej(mesej: "HI !!", sendedByMe: true),
-    chatMesej(mesej: "Hello", sendedByMe: false),
-    chatMesej(mesej: "How are you ?", sendedByMe: true),
-    chatMesej(mesej: "I am fine, Thanks !", sendedByMe: false),
-    chatMesej(
-        mesej:
-            "I currently have a listened operating on the whole of my screen. I would like to have a button in the bottom of the screen",
-        sendedByMe: true),
-    chatMesej(
-        mesej:
-            "ListView is the most commonly used scrolling widget. It displays its children one after another in the scroll direction.",
-        sendedByMe: false),
-  ];
-  List? mesej = [];
+  // List<Widget> chatList = [
+  //   chatMesej(mesej: "HI !!", sendedByMe: true),
+  //   chatMesej(mesej: "Hello", sendedByMe: false),
+  //   chatMesej(mesej: "How are you ?", sendedByMe: true),
+  //   chatMesej(mesej: "I am fine, Thanks !", sendedByMe: false),
+  //   chatMesej(
+  //       mesej:
+  //           "I currently have a listened operating on the whole of my screen. I would like to have a button in the bottom of the screen",
+  //       sendedByMe: true),
+  //   chatMesej(
+  //       mesej:
+  //           "ListView is the most commonly used scrolling widget. It displays its children one after another in the scroll direction.",
+  //       sendedByMe: false),
+  // ];
+
   String sender = '';
   String colname = '';
 
   TextEditingController mesejText = TextEditingController();
+  ShowMessagesPageVariables object = ShowMessagesPageVariables();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    sender = Hive.box(userLoginInfoSaveKey).get('name');
+    Box userLoginInfoBox = Hive.box(userLoginInfoSaveKey);
+    addNewChat(userLoginInfoBox);
+    sender = userLoginInfoBox.get('name');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       var temp = await FirebaseDatabase.instance
           .ref('chats')
           .child('$sender - ${widget.user}')
           .get();
       if (temp.exists) {
-        colname = '$sender - ${widget.user}';
+        object.setColName = '$sender - ${widget.user}';
+        object.fetchMessages(me: sender);
+        object.changeLoadingState = true;
       } else {
-        colname = '${widget.user} - $sender';
+        object.setColName = '${widget.user} - $sender';
+        object.fetchMessages(me: sender);
+        object.changeLoadingState = true;
       }
-      print(colname);
+      debugPrint('colName is ========> $colname');
     });
-    // ChangeNotifierProvider(
-    //   create: (context) => ShowMessagesPageVariables(collectionName: colname),
-    //   builder: (context, child) => Consumer<ShowMessagesPageVariables>(
-    //     builder: (context, value, child) {
-    //       mesej = value.getMessages;
-    //       return const SizedBox();
-    //     },
-    //   ),
-    // );
+  }
+
+  void addNewChat(Box userLoginInfoBox) async {
+    if (widget.newChat) {
+      DataSnapshot userDataSnapshot =
+          await FirebaseDatabase.instance.ref('users').get();
+      List userList = userDataSnapshot.value as List;
+      // for (var i = 0; i < userList.length; i++) {
+      //   if (userList[i]['email'] == userLoginInfoBox.get('email')) {
+      //     List chatPersons = userList[i]['chat_persons'] as List;
+      //     chatPersons.add(widget.user);
+      //     await FirebaseDatabase.instance
+      //         .ref('users')
+      //         .child(i.toString())
+      //         .update({'chat_persons': chatPersons});
+      //   }
+      // }
+      for (var element in userList) {
+        if (element['email'] == Hive.box(userLoginInfoSaveKey).get('email')) {
+          userList.remove(element);
+          List chatPersons = element['chat_persons'] as List;
+          chatPersons.add(widget.user);
+          element['chat_persons'] = chatPersons;
+          userList.add(element);
+          FirebaseDatabase.instance.ref('users').set(userList);
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (colname != '') {
-      return ChangeNotifierProvider<ShowMessagesPageVariables>(
-        create: (context) => ShowMessagesPageVariables(collectionName: colname),
-        child: Consumer<ShowMessagesPageVariables>(
-          builder: (context, value, child) {
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              mesej = value.getMessages;
-            });
+    return ChangeNotifierProvider.value(
+      value: object,
+      child: Consumer<ShowMessagesPageVariables>(
+        builder: (context, value, child) {
+          if (value.loaded) {
             return Scaffold(
               appBar: AppBar(
                 title: Text(widget.user),
@@ -99,10 +109,15 @@ class _ShowMessagesState extends State<ShowMessages> {
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: chatList,
-                      ),
+                      child: value.chatList.isNotEmpty
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: value.chatList,
+                            )
+                          : const Center(
+                              child: Text(
+                                  "No Messages yet, send your 1st Message Now."),
+                            ),
                     ),
                   ),
                   SizedBox(
@@ -152,16 +167,16 @@ class _ShowMessagesState extends State<ShowMessages> {
                 ],
               ),
             );
-          },
-        ),
-      );
-    } else {
-      return const Scaffold(
-        body: SafeArea(
-            child: Center(
-          child: CircularProgressIndicator(),
-        )),
-      );
-    }
+          } else {
+            return const Scaffold(
+              body: SafeArea(
+                  child: Center(
+                child: CircularProgressIndicator(),
+              )),
+            );
+          }
+        },
+      ),
+    );
   }
 }

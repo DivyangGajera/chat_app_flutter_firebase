@@ -1,14 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:chat_app_flutter_firebase/model/user_model.dart' as user;
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import '../controller/firebase_auth_helper.dart';
-import '../controller/users_data_fecther.dart';
+import '../controller/users_data_fetcher.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +19,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     process();
   }
@@ -41,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
           () => Navigator.popAndPushNamed(context, '/chats',
               arguments: {'userData': ls}),
         );
-      } on FirebaseAuthException catch (temp) {
+      } catch (temp) {
         Future.delayed(
             const Duration(seconds: 1),
             () => Navigator.pushReplacementNamed(context, '/sign_up',

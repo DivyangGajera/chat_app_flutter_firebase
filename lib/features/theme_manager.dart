@@ -7,6 +7,13 @@ import 'package:flutter/material.dart';
 class ThemeManager extends ChangeNotifier {
   ThemeMode _currentTheme = ThemeMode.system;
   int _themeNo = 1;
+  String colnameForShowMessagePage = '';
+
+  get getColname => colnameForShowMessagePage;
+  set setColname(String changes) {
+    colnameForShowMessagePage = changes;
+    notifyListeners();
+  }
 
   int get getThemeNo => _themeNo;
   set setThemeNo(int newNo) {

@@ -3,8 +3,8 @@ import 'package:chat_app_flutter_firebase/utilities/titles.dart';
 import 'package:flutter/material.dart';
 
 class MakeNewChat extends StatelessWidget {
-  List<User> ls;
-  MakeNewChat({required this.ls, super.key});
+  final List<User> ls;
+  const MakeNewChat({required this.ls, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +22,13 @@ class MakeNewChat extends StatelessWidget {
               return ListTile(
                 onTap: () => Navigator.popAndPushNamed(
                     context, "/show_messages",
-                    arguments: {'user': ls[index].name}),
+                    arguments: {'user': ls[index].name, 'newChat': true}),
                 title: Text(ls[index].name),
                 subtitle: Text(ls[index].email),
-                leading: Icon(Icons.account_circle_outlined),
+                leading: const Icon(Icons.account_circle_outlined),
               );
             },
-            separatorBuilder: (context, index) => Divider(),
+            separatorBuilder: (context, index) => const Divider(),
             itemCount: ls.length),
       ),
     );
