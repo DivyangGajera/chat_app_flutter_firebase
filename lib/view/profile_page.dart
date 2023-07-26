@@ -31,7 +31,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-
+  
+  
     name = Hive.box(userLoginInfoSaveKey).get('name');
     imageLoader(varibales);
     FirebaseDatabase.instance.setPersistenceEnabled(true);
