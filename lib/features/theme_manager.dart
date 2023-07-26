@@ -63,11 +63,15 @@ class Themes {
       primaryColor: Colors.blue);
 
   static ThemeData darkTheme = ThemeData(
+    primaryColorDark: Colors.deepPurple,
+      appBarTheme: AppBarTheme(backgroundColor: Colors.deepPurple),
+      textTheme: TextTheme(),
       brightness: Brightness.dark,
       elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue, fixedSize: Size(138, 45))),
       primaryColor: Colors.white,
+      // primaryColorDark: Colors.white,
       useMaterial3: false,
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.blue,

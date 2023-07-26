@@ -20,32 +20,19 @@ class ShowMessages extends StatefulWidget {
 }
 
 class _ShowMessagesState extends State<ShowMessages> {
-  // List<Widget> chatList = [
-  //   chatMesej(mesej: "HI !!", sendedByMe: true),
-  //   chatMesej(mesej: "Hello", sendedByMe: false),
-  //   chatMesej(mesej: "How are you ?", sendedByMe: true),
-  //   chatMesej(mesej: "I am fine, Thanks !", sendedByMe: false),
-  //   chatMesej(
-  //       mesej:
-  //           "I currently have a listened operating on the whole of my screen. I would like to have a button in the bottom of the screen",
-  //       sendedByMe: true),
-  //   chatMesej(
-  //       mesej:
-  //           "ListView is the most commonly used scrolling widget. It displays its children one after another in the scroll direction.",
-  //       sendedByMe: false),
-  // ];
-
   String sender = '';
   String colname = '';
 
   TextEditingController mesejText = TextEditingController();
   ShowMessagesPageVariables object = ShowMessagesPageVariables();
 
+  ScrollController scrollContoroller = ScrollController();
+
   @override
   void initState() {
     super.initState();
     Box userLoginInfoBox = Hive.box(userLoginInfoSaveKey);
-    addNewChat(userLoginInfoBox);
+    // addNewChat(userLoginInfoBox);
     sender = userLoginInfoBox.get('name');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       var temp = await FirebaseDatabase.instance
@@ -62,52 +49,55 @@ class _ShowMessagesState extends State<ShowMessages> {
         object.changeLoadingState = true;
       }
       debugPrint('colName is ========> $colname');
+      if (scrollContoroller.hasClients) {
+        scrollContoroller.jumpTo(scrollContoroller.position.maxScrollExtent);
+      }
     });
   }
 
-  void addNewChat(Box userLoginInfoBox) async {
-    if (widget.newChat) {
-      DataSnapshot userDataSnapshot =
-          await FirebaseDatabase.instance.ref('users').get();
-      List userList = userDataSnapshot.value as List;
-      // for (var i = 0; i < userList.length; i++) {
-      //   if (userList[i]['email'] == userLoginInfoBox.get('email')) {
-      //     List chatPersons = userList[i]['chat_persons'] as List;
-      //     chatPersons.add(widget.user);
-      //     await FirebaseDatabase.instance
-      //         .ref('users')
-      //         .child(i.toString())
-      //         .update({'chat_persons': chatPersons});
-      //   }
-      // }
-      for (var element in userList) {
-        if (element['email'] == Hive.box(userLoginInfoSaveKey).get('email')) {
-          userList.remove(element);
-          List chatPersons = element['chat_persons'] as List;
-          chatPersons.add(widget.user);
-          element['chat_persons'] = chatPersons;
-          userList.add(element);
-          FirebaseDatabase.instance.ref('users').set(userList);
-        }
-      }
-    }
-  }
+  // void addNewChat(Box userLoginInfoBox) async {
+  //   if (widget.newChat) {
+  //     DataSnapshot userDataSnapshot =
+  //         await FirebaseDatabase.instance.ref('users').get();
+  //     List userList = userDataSnapshot.value as List;
+
+  //     for (var element in userList) {
+  //       if (element['email'] == Hive.box(userLoginInfoSaveKey).get('email')) {
+  //         userList.remove(element);
+  //         List chatPersons = element['chat_persons'] as List;
+  //         chatPersons.add(widget.user);
+  //         element['chat_persons'] = chatPersons;
+  //         userList.add(element);
+  //         FirebaseDatabase.instance.ref('users').set(userList);
+  //       }
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: object,
-      child: Consumer<ShowMessagesPageVariables>(
-        builder: (context, value, child) {
-          if (value.loaded) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(widget.user),
-              ),
-              body: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.user),
+      ),
+      body: ChangeNotifierProvider.value(
+        value: object,
+        child: Consumer<ShowMessagesPageVariables>(
+          builder: (context, value, child) {
+            if (value.isLoaded) {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (timeStamp) {
+                  scrollContoroller.animateTo(
+                      scrollContoroller.position.maxScrollExtent,
+                      duration: Duration(milliseconds: 100),
+                      curve: Curves.linear);
+                },
+              );
+              return Column(
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
+                      controller: scrollContoroller,
                       physics: const BouncingScrollPhysics(),
                       child: value.chatList.isNotEmpty
                           ? Column(
@@ -121,18 +111,22 @@ class _ShowMessagesState extends State<ShowMessages> {
                     ),
                   ),
                   SizedBox(
-                    height: 60,
+                    height: 70,
                     child: Row(
                       children: [
-                        Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            width: MediaQuery.sizeOf(context).width - 50,
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
                             child: TextField(
                               keyboardType: TextInputType.multiline,
-                              onSubmitted: (input) {
-                                input = "$input\n";
+                              onChanged: (input) {
+                                // input = "$input\n";
+                                if (input.trim().isNotEmpty) {
+                                  value.setSendButtonVisibility = true;
+                                } else {
+                                  value.setSendButtonVisibility = false;
+                                }
                               },
-                              textInputAction: TextInputAction.newline,
                               controller: mesejText,
                               decoration: InputDecoration(
                                   enabledBorder: OutlineInputBorder(
@@ -144,38 +138,46 @@ class _ShowMessagesState extends State<ShowMessages> {
                                   ),
                                   hintText: "Message : ",
                                   isDense: true),
-                            )),
-                        IconButton(
-                            color: Colors.blue,
-                            onPressed: () async {
-                              var now = DateTime.now();
-                              await MessagesController.sendMessage(
-                                  mesej: Message(
-                                      sender: sender,
-                                      message: mesejText.text,
-                                      receiver: widget.user,
-                                      time: '${now.hour} : ${now.minute}'));
-                              mesejText.clear();
-                            },
-                            icon: const Icon(
-                              Icons.send,
-                              size: 30,
-                            ))
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: value.sendButtonVisibility,
+                          child: IconButton(
+                              color: Colors.blue,
+                              onPressed: () async {
+                                if (mesejText.text.trim().isNotEmpty) {
+                                  var now = DateTime.now();
+                                  await MessagesController.sendMessage(
+                                      mesej: Message(
+                                          sender: sender,
+                                          message: mesejText.text,
+                                          receiver: widget.user,
+                                          time: '${now.hour} : ${now.minute}'));
+                                  mesejText.clear();
+                                  value.setSendButtonVisibility = false;
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.send,
+                                size: 30,
+                              )),
+                        )
                       ],
                     ),
                   )
                 ],
-              ),
-            );
-          } else {
-            return const Scaffold(
-              body: SafeArea(
-                  child: Center(
-                child: CircularProgressIndicator(),
-              )),
-            );
-          }
-        },
+              );
+            } else {
+              return const Scaffold(
+                body: SafeArea(
+                    child: Center(
+                  child: CircularProgressIndicator(),
+                )),
+              );
+            }
+          },
+        ),
       ),
     );
   }

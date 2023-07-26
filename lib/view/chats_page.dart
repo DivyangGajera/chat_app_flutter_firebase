@@ -59,23 +59,23 @@ class _ChatsState extends State<Chats> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: ChatScreenNavigationDrawer(name: name, email: email),
-      // floatingActionButton: ElevatedButton.icon(
-      //   style: ElevatedButton.styleFrom(
-      //       shape: RoundedRectangleBorder(
-      //           borderRadius: BorderRadius.circular(50))),
-      //   onPressed: () {
-      //     List<User> send = [];
-      //     for (var element in widget.ls) {
-      //       if (element.email != email) {
-      //         send.add(element);
-      //       }
-      //     }
-      //     Navigator.pushNamed(context, "/make_new_chat",
-      //         arguments: {'userData': send});
-      //   },
-      //   label: Text(chatsFABText),
-      //   icon: const Icon(Icons.chat),
-      // ),
+      floatingActionButton: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50))),
+        onPressed: () {
+          List<User> send = [];
+          for (var element in widget.ls) {
+            if (element.email != email) {
+              send.add(element);
+            }
+          }
+          Navigator.pushNamed(context, "/make_new_chat",
+              arguments: {'userData': send});
+        },
+        label: Text(chatsFABText),
+        icon: const Icon(Icons.chat),
+      ),
       appBar: AppBar(
         title: Text(chatsTitle),
       ),
@@ -85,6 +85,7 @@ class _ChatsState extends State<Chats> {
           return true;
         },
         child: ListView.separated(
+          
             itemBuilder: (context, index) {
               return ListTile(
                 onTap: () => Navigator.pushNamed(context, "/show_messages",

@@ -89,11 +89,9 @@ Widget chatMesej(
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Flexible(
-              child: Text(
-                mesej,
-                style: messageStyle,
-              ),
+            child:  Text(
+              mesej,
+              style: messageStyle,
             ),
           ),
         ),

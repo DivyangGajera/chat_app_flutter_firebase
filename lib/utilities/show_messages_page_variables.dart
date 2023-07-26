@@ -1,5 +1,5 @@
 import 'package:chat_app_flutter_firebase/model/mesaage_model.dart';
-import 'package:chat_app_flutter_firebase/utilities/widgets.dart';
+import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +9,16 @@ class ShowMessagesPageVariables extends ChangeNotifier {
   List<Widget> get getChatList => chatList;
   List messages = [];
 
+  bool _loaded = false;
+  bool _sendButtonVisible = false;
+  bool get sendButtonVisibility => _sendButtonVisible;
+  bool get isLoaded => _loaded;
+
+  set setSendButtonVisibility(bool input) {
+    _sendButtonVisible = input;
+    notifyListeners();
+  }
+
   String colName = '';
 
   set setColName(String collectionName) {
@@ -16,9 +26,8 @@ class ShowMessagesPageVariables extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool loaded = false;
   set changeLoadingState(bool changedState) {
-    loaded = changedState;
+    _loaded = changedState;
     notifyListeners();
   }
 
@@ -38,9 +47,18 @@ class ShowMessagesPageVariables extends ChangeNotifier {
               .add(Message.fromJsonToMessageModel(jsonData: messages[i]));
         }
         chatList = messageList
-            .map((e) => chatMesej(
-                mesej: e.message, sendedByMe: e.sender == me, time: e.time))
+            .map((e) => BubbleSpecialOne(
+                  text: e.message,
+                  color: e.sender == me ? Colors.grey : Colors.grey.shade300,
+                  isSender: e.sender == me,
+                  delivered: true,
+                  seen: true,
+                ))
             .toList();
+        // chatList = messageList
+        //     .map((e) => chatMesej(
+        //         mesej: e.message, sendedByMe: e.sender == me, time: e.time))
+        //     .toList();
         notifyListeners();
       });
     }

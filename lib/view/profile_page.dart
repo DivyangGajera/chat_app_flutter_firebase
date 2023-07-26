@@ -26,8 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
-
+    
     super.initState();
 
     name = Hive.box(userLoginInfoSaveKey).get('name');

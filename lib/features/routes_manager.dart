@@ -48,18 +48,13 @@ class RoutesManager {
       case '/make_new_chat':
         Map data = settings.arguments as Map;
 
-        return MaterialPageRoute(
-          builder: (context) => ShowMessages(
-            user: data['user'],
-            newChat: data['newChat'] ?? false,
-          ),
-        );
-      // return MaterialPageRoute(
-      //   builder: (context) => ChangeNotifierProvider(
-      //     create: (context) => SigninPageVariables(),
-      //     builder: (context, child) => MakeNewChat(ls: data['userData']),
-      //   ),
-      // );
+        
+      return MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (context) => SigninPageVariables(),
+          builder: (context, child) => MakeNewChat(ls: data['userData']),
+        ),
+      );
 
       case '/show_messages':
         Map arguments = settings.arguments as Map;
@@ -96,7 +91,9 @@ class RoutesManager {
       case '/profile':
         Map args = settings.arguments as Map;
         return MaterialPageRoute(
-          builder: (context) => ProfilePage(email: args['email'], name: args['name']),
+          builder: (context) => ChangeNotifierProvider<ProfilePageVariables>(
+              create: (context) => ProfilePageVariables(),
+              child: ProfilePage(email: args['email'], name: args['name'])),
         );
       default:
         return null;
