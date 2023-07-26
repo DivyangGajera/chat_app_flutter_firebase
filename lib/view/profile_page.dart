@@ -24,13 +24,33 @@ class _ProfilePageState extends State<ProfilePage> {
   String imageUrl = '', name = '';
   ProfilePageVariables varibales = ProfilePageVariables();
 
+  int? userIndex;
+
+  TextEditingController nameController = TextEditingController();
+
   @override
   void initState() {
-    
     super.initState();
 
     name = Hive.box(userLoginInfoSaveKey).get('name');
     imageLoader(varibales);
+    FirebaseDatabase.instance.setPersistenceEnabled(true);
+    var userRef = FirebaseDatabase.instance.ref('users');
+    userRef.keepSynced(true);
+    var data = userRef.get();
+    data.then((value) {
+      List users = value.value as List;
+      for (var i = 0; i < users.length; i++) {
+        if (users[i]['name'] == name) {
+          userIndex = i;
+          print(userIndex);
+        }
+      }
+    });
+    var me = FirebaseDatabase.instance
+        .ref('users/$userIndex')
+        .get()
+        .then((value) => print('userinfo ====> ${value.value}'));
   }
 
   @override
@@ -64,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 XFile? image = await ImagePicker()
                                     .pickImage(source: ImageSource.camera);
                                 var ref = FirebaseStorage.instance
-                                    .ref('profile_pic')
+                                    .ref('profilePic')
                                     .child(name);
                                 ref.putFile(File(image!.path));
                                 imageUrl = await ref.getDownloadURL();
@@ -76,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 users.forEach(
                                   (element) {
                                     if (element['name'] == name) {
-                                      element['profile_pic'] = imageUrl;
+                                      element['profilePic'] = imageUrl;
                                     }
                                   },
                                 );
@@ -85,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     .set(users);
                                 value.changePhotoAvailableState = true;
                               },
-                              child: const Padding(
+                              child: Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -93,16 +113,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Icon(
                                       Icons.camera,
                                       size: 40,
-                                      color: Colors.black,
+                                      color: Theme.of(context).primaryColor,
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 10,
                                     ),
                                     Text(
                                       'Camera',
                                       style: TextStyle(
                                         fontSize: 20,
-                                        color: Colors.black,
+                                        color: Theme.of(context).primaryColor,
                                       ),
                                     )
                                   ],
@@ -113,7 +133,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 XFile? image = await ImagePicker()
                                     .pickImage(source: ImageSource.gallery);
                                 var ref = FirebaseStorage.instance
-                                    .ref('profile_pic')
+                                    .ref('profilePic')
                                     .child(name);
                                 ref.putFile(File(image!.path));
                                 imageUrl = await ref.getDownloadURL();
@@ -125,7 +145,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 users.forEach(
                                   (element) {
                                     if (element['name'] == name) {
-                                      element['profile_pic'] = imageUrl;
+                                      element['profilePic'] = imageUrl;
                                     }
                                   },
                                 );
@@ -134,24 +154,24 @@ class _ProfilePageState extends State<ProfilePage> {
                                     .set(users);
                                 value.changePhotoAvailableState = true;
                               },
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
                                       Icons.photo_library_sharp,
                                       size: 40,
-                                      color: Colors.black,
+                                      color: Theme.of(context).primaryColor,
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 10,
                                     ),
                                     Text(
                                       'Gallery',
                                       style: TextStyle(
                                         fontSize: 20,
-                                        color: Colors.black,
+                                        color: Theme.of(context).primaryColor,
                                       ),
                                     )
                                   ],
@@ -161,35 +181,27 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     );
                   },
-                  position: badge.BadgePosition.custom(bottom: 20, end: 25),
+                  position: badge.BadgePosition.custom(bottom: 10, end: 10),
                   showBadge: true,
                   badgeAnimation: const badge.BadgeAnimation.slide(),
                   badgeStyle: const badge.BadgeStyle(badgeColor: Colors.green),
-                  badgeContent: value.photoIsAvailable
+                  badgeContent: const Icon(
+                    Icons.camera,
+                    size: 40,
+                    color: Colors.white,
+                  ),
+                  child: value.photoIsAvailable
                       ? CircleAvatar(
                           backgroundImage: NetworkImage(imageUrl),
-                          radius: 150,
+                          radius: 120,
                         )
                       : const Icon(
-                          Icons.camera,
-                          size: 40,
-                          color: Colors.white,
+                          Icons.account_circle,
+                          size: 250,
                         ),
-                  child: const Icon(
-                    Icons.account_circle,
-                    size: 250,
-                  ),
                 ),
                 const SizedBox(
                   height: 70,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "                  Name : ",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
                 ),
                 ListTile(
                   leading: const Icon(
@@ -197,14 +209,139 @@ class _ProfilePageState extends State<ProfilePage> {
                     size: 40,
                   ),
                   trailing: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet(
+                          elevation: 5,
+                          shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10))),
+                          // isScrollControlled: true,
+                          context: context,
+                          builder: (context) => Container(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              // mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Enter your name :",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                TextField(
+                                  // decoration: InputDecoration(),
+                                  autofocus: true,
+                                  controller: nameController,
+                                ),
+                                ButtonBar(
+                                  children: [
+                                    OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          var me = FirebaseDatabase.instance
+                                              .ref('users/$userIndex');
+                                          var dataSnapshot = me.get();
+                                          dataSnapshot.then((value) {
+                                            Map myData = value.value as Map;
+                                          });
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(
+                                                color: Colors.black),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            backgroundColor: Colors.white),
+                                        child: const Text(
+                                          "Yes",
+                                          style: TextStyle(
+                                              fontSize: 17, color: Colors.red),
+                                        )),
+                                    OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(
+                                                color: Colors.black),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            backgroundColor: Colors.white),
+                                        child: const Text(
+                                          "No",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              color: Colors.green),
+                                        )),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (context) => AlertDialog(
+                        //       backgroundColor:
+                        //           Theme.of(context).secondaryHeaderColor,
+                        //       shape: RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.circular(25)),
+                        //       title: const Text(
+                        //         "Are you sure you want to Sign out ?",
+                        //         style: TextStyle(fontSize: 20),
+                        //       ),
+                        //       actionsAlignment: MainAxisAlignment.spaceEvenly,
+                        //       actions: [
+                        //         OutlinedButton(
+                        //             onPressed: () {
+                        //               Navigator.pop(context);
+                        //             },
+                        //             style: OutlinedButton.styleFrom(
+                        //                 side: const BorderSide(
+                        //                     color: Colors.black),
+                        //                 shape: RoundedRectangleBorder(
+                        //                     borderRadius:
+                        //                         BorderRadius.circular(50)),
+                        //                 backgroundColor: Colors.white),
+                        //             child: const Text(
+                        //               "Yes",
+                        //               style: TextStyle(
+                        //                   fontSize: 17, color: Colors.red),
+                        //             )),
+                        //         OutlinedButton(
+                        //             onPressed: () {
+                        //               Navigator.pop(context);
+                        //             },
+                        //             style: OutlinedButton.styleFrom(
+                        //                 side: const BorderSide(
+                        //                     color: Colors.black),
+                        //                 shape: RoundedRectangleBorder(
+                        //                     borderRadius:
+                        //                         BorderRadius.circular(50)),
+                        //                 backgroundColor: Colors.white),
+                        //             child: const Text(
+                        //               "No",
+                        //               style: TextStyle(
+                        //                   fontSize: 17, color: Colors.green),
+                        //             )),
+                        //       ]),
+                        // );
+                      },
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.blue,
                       )),
-                  title: Text(
-                    widget.name,
-                    style: drawerHeaderStyle,
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Name :'),
+                      Text(widget.name,
+                          style: Theme.of(context).textTheme.headlineSmall),
+                    ],
                   ),
                   subtitle: const Text(
                     "This is name will be visible to other person when you send the message.",
@@ -219,23 +356,82 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 ListTile(
                   leading: const Icon(
-                    Icons.email,
+                    Icons.info,
                     size: 40,
                   ),
                   trailing: IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                              backgroundColor:
+                                  Theme.of(context).secondaryHeaderColor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25)),
+                              title: const Text(
+                                "Enter the about description :",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              actionsAlignment: MainAxisAlignment.spaceEvenly,
+                              actions: [
+                                OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(
+                                            color: Colors.black),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        backgroundColor: Colors.white),
+                                    child: const Text(
+                                      "Yes",
+                                      style: TextStyle(
+                                          fontSize: 17, color: Colors.red),
+                                    )),
+                                OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(
+                                            color: Colors.black),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        backgroundColor: Colors.white),
+                                    child: const Text(
+                                      "No",
+                                      style: TextStyle(
+                                          fontSize: 17, color: Colors.green),
+                                    )),
+                              ]),
+                        );
+                      },
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.blue,
                       )),
                   title: Text(
+                    "About : ",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  subtitle: Text(widget.email,
+                      style: Theme.of(context).textTheme.headlineSmall),
+                ),
+                Divider(),
+                ListTile(
+                  leading: const Icon(
+                    Icons.email,
+                    size: 40,
+                  ),
+                  title: Text(
                     "E-mail : ",
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  subtitle: Text(
-                    widget.email,
-                    style: drawerHeaderStyle,
-                  ),
+                  subtitle: Text(widget.email,
+                      style: Theme.of(context).textTheme.headlineSmall),
                 ),
               ]);
             },

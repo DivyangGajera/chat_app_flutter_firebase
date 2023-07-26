@@ -39,11 +39,11 @@ class _ChatsState extends State<Chats> {
       // print(element.name);
       if (element.email == email) {
         // print(element.chat_persons);
-        for (var i = 0; i < element.chat_persons.length; i++) {
+        for (var i = 0; i < element.chatPersons.length; i++) {
           // print("from chat persons : " + element.chat_persons[i]);
           // print("from db : " + widget.ls[i].name);
           for (var element1 in widget.ls) {
-            if (element.chat_persons[i] == element1.name) {
+            if (element.chatPersons[i] == element1.name) {
               // print("object = ${element.chat_persons[i] == element1.name}");
               chatPersons.add(element1);
             }
@@ -58,11 +58,17 @@ class _ChatsState extends State<Chats> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       drawer: ChatScreenNavigationDrawer(name: name, email: email),
-      floatingActionButton: ElevatedButton.icon(
+      floatingActionButton: OutlinedButton(
         style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50))),
+            shape: CircleBorder(),
+            padding: EdgeInsets.all(18),
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor),
+        child: Icon(
+          Icons.chat,
+          color: Colors.white,
+        ),
         onPressed: () {
           List<User> send = [];
           for (var element in widget.ls) {
@@ -73,8 +79,6 @@ class _ChatsState extends State<Chats> {
           Navigator.pushNamed(context, "/make_new_chat",
               arguments: {'userData': send});
         },
-        label: Text(chatsFABText),
-        icon: const Icon(Icons.chat),
       ),
       appBar: AppBar(
         title: Text(chatsTitle),
@@ -85,7 +89,6 @@ class _ChatsState extends State<Chats> {
           return true;
         },
         child: ListView.separated(
-          
             itemBuilder: (context, index) {
               return ListTile(
                 onTap: () => Navigator.pushNamed(context, "/show_messages",

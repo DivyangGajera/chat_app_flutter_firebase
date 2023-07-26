@@ -51,6 +51,7 @@ class FirebaseAuthHelper {
       localDB.put('uid', firebaseAuth.user!.uid);
       localDB.put('email', email);
       localDB.put('password', password);
+      localDB.put('userIndex', data.length + 1);
 
       //show signUp success message to user
       ScaffoldMessenger.of(context).showSnackBar(snackBar(
@@ -77,12 +78,16 @@ class FirebaseAuthHelper {
       // getting old data back to add new into it
       var values = await firebaseDatabase.ref('users').get();
       List data = values.value as List<dynamic>;
+
       users = data.map((element) {
         return {
+          'chatPersons': element['chatPersons'],
           'name': element['name'],
           'email': element['email'],
           'password': element['password'],
           'uid': element['uid'],
+          'profile_pic': element['profile_pic'],
+          'userIndex': element['userIndex']
         };
       }).toList();
 
@@ -95,6 +100,9 @@ class FirebaseAuthHelper {
           localDB.put('uid', firebaseAuth.user!.uid);
           localDB.put('email', email);
           localDB.put('password', password);
+          localDB.put('profilePic', element['profilePic']);
+          localDB.put('chatPersons', element['chatPersons']);
+          localDB.put('userIndex', element['userIndex']);
           debugPrint('data stored');
         }
       }

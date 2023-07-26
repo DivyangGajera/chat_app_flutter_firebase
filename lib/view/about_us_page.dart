@@ -15,7 +15,7 @@ class AboutUsPage extends StatelessWidget {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text(
             "My Chat App - About",
-            style: drawerHeaderStyle,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           Text(
             "\nVersion 1.0.0",

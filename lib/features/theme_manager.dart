@@ -2,6 +2,7 @@
 
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ThemeManager extends ChangeNotifier {
@@ -38,34 +39,27 @@ OutlineInputBorder border({required Color borderColor}) => OutlineInputBorder(
 
 class Themes {
   static ThemeData lightTheme = ThemeData(
-      appBarTheme: const AppBarTheme(backgroundColor: Colors.blue),
-      brightness: Brightness.light,
-      pageTransitionsTheme: PageTransitionsTheme(builders: {
-        TargetPlatform.android: CupertinoPageTransitionsBuilder()
-      }),
-      colorScheme: const ColorScheme.light(),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, fixedSize: const Size(138, 45))),
-      useMaterial3: false,
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        elevation: 3,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        isDense: true,
-        filled: true,
-        fillColor: Colors.white,
-        enabledBorder: border(borderColor: Colors.grey),
-        focusedBorder: border(borderColor: Colors.blue),
-      ),
-      primaryColor: Colors.blue);
+    appBarTheme: const AppBarTheme(backgroundColor: Colors.blue),
+    brightness: Brightness.light,
+    pageTransitionsTheme: PageTransitionsTheme(
+        builders: {TargetPlatform.android: CupertinoPageTransitionsBuilder()}),
+    colorScheme: const ColorScheme.light(),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue, fixedSize: const Size(138, 45))),
+    useMaterial3: false,
+    primaryColor: Colors.black,
+    inputDecorationTheme: InputDecorationTheme(
+      isDense: true,
+      filled: true,
+      fillColor: Colors.white,
+      enabledBorder: border(borderColor: Colors.grey),
+      focusedBorder: border(borderColor: Colors.blue),
+    ),
+  );
 
   static ThemeData darkTheme = ThemeData(
-    primaryColorDark: Colors.deepPurple,
-      appBarTheme: AppBarTheme(backgroundColor: Colors.deepPurple),
-      textTheme: TextTheme(),
+      appBarTheme: AppBarTheme(backgroundColor: CupertinoColors.systemPurple),
       brightness: Brightness.dark,
       elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -73,9 +67,6 @@ class Themes {
       primaryColor: Colors.white,
       // primaryColorDark: Colors.white,
       useMaterial3: false,
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Colors.blue,
-          extendedTextStyle: TextStyle(fontSize: 17, color: Colors.white)),
       inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         filled: true,

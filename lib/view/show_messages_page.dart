@@ -4,6 +4,7 @@ import 'package:chat_app_flutter_firebase/controller/messages_controller.dart';
 import 'package:chat_app_flutter_firebase/model/mesaage_model.dart';
 import 'package:chat_app_flutter_firebase/utilities/show_messages_page_variables.dart';
 import 'package:chat_app_flutter_firebase/utilities/titles.dart';
+import 'package:chat_bubbles/bubbles/bubble_normal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -93,80 +94,110 @@ class _ShowMessagesState extends State<ShowMessages> {
                       curve: Curves.linear);
                 },
               );
-              return Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: scrollContoroller,
-                      physics: const BouncingScrollPhysics(),
+              return Container(
+                decoration: BoxDecoration(
+                    image: Theme.of(context).brightness == Brightness.dark
+                        ? const DecorationImage(
+                            image:
+                                AssetImage('assets/images/chats_dark_bg.jpg'),
+                            fit: BoxFit.fill)
+                        : const DecorationImage(
+                            image:
+                                AssetImage('assets/images/chats_light_bg.jpg'),
+                            fit: BoxFit.fill)),
+                child: Column(
+                  children: [
+                    Expanded(
                       child: value.chatList.isNotEmpty
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: value.chatList,
+                          ? ListView.builder(
+                              controller: scrollContoroller,
+                              physics: const BouncingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                Message bubble = value.messageObjectList[index];
+                                bool sentByMe = bubble.sender == sender;
+
+                                return BubbleNormal(
+                                  tail: true,
+                                  color: sentByMe
+                                      ? Theme.of(context)
+                                          .appBarTheme
+                                          .backgroundColor!
+                                      : Colors.green,
+                                  isSender: sentByMe,
+                                  text: bubble.message,
+                                  textStyle: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                );
+                              },
+                              itemCount: value.messageObjectList.length,
                             )
                           : const Center(
                               child: Text(
-                                  "No Messages yet, send your 1st Message Now."),
+                                "No Messages yet, send your 1st Message Now.",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 70,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextField(
-                              keyboardType: TextInputType.multiline,
-                              onChanged: (input) {
-                                // input = "$input\n";
-                                if (input.trim().isNotEmpty) {
-                                  value.setSendButtonVisibility = true;
-                                } else {
-                                  value.setSendButtonVisibility = false;
-                                }
-                              },
-                              controller: mesejText,
-                              decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15)),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide:
-                                        const BorderSide(color: Colors.blue),
-                                  ),
-                                  hintText: "Message : ",
-                                  isDense: true),
+                    SizedBox(
+                      height: 70,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextField(
+                                keyboardType: TextInputType.multiline,
+                                onChanged: (input) {
+                                  // input = "$input\n";
+                                  if (input.trim().isNotEmpty) {
+                                    value.setSendButtonVisibility = true;
+                                  } else {
+                                    value.setSendButtonVisibility = false;
+                                  }
+                                },
+                                controller: mesejText,
+                                decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide:
+                                          const BorderSide(color: Colors.blue),
+                                    ),
+                                    hintText: "Message : ",
+                                    isDense: true),
+                              ),
                             ),
                           ),
-                        ),
-                        Visibility(
-                          visible: value.sendButtonVisibility,
-                          child: IconButton(
-                              color: Colors.blue,
-                              onPressed: () async {
-                                if (mesejText.text.trim().isNotEmpty) {
-                                  var now = DateTime.now();
-                                  await MessagesController.sendMessage(
-                                      mesej: Message(
-                                          sender: sender,
-                                          message: mesejText.text,
-                                          receiver: widget.user,
-                                          time: '${now.hour} : ${now.minute}'));
-                                  mesejText.clear();
-                                  value.setSendButtonVisibility = false;
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.send,
-                                size: 30,
-                              )),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                          Visibility(
+                            visible: value.sendButtonVisibility,
+                            child: IconButton(
+                                color: Colors.blue,
+                                onPressed: () async {
+                                  if (mesejText.text.trim().isNotEmpty) {
+                                    var now = DateTime.now();
+                                    await MessagesController.sendMessage(
+                                        mesej: Message(
+                                            sender: sender,
+                                            message: mesejText.text,
+                                            receiver: widget.user,
+                                            time:
+                                                '${now.hour} : ${now.minute}'));
+                                    mesejText.clear();
+                                    value.setSendButtonVisibility = false;
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.send,
+                                  size: 30,
+                                )),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               );
             } else {
               return const Scaffold(

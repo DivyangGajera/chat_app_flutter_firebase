@@ -47,9 +47,11 @@ class ShowMessagesPageVariables extends ChangeNotifier {
               .add(Message.fromJsonToMessageModel(jsonData: messages[i]));
         }
         chatList = messageList
-            .map((e) => BubbleSpecialOne(
+            .map((e) => BubbleNormal(
                   text: e.message,
-                  color: e.sender == me ? Colors.grey : Colors.grey.shade300,
+                  color: e.sender == me
+                      ? Colors.deepPurpleAccent.shade100
+                      : Colors.grey.shade300,
                   isSender: e.sender == me,
                   delivered: true,
                   seen: true,
@@ -63,6 +65,8 @@ class ShowMessagesPageVariables extends ChangeNotifier {
       });
     }
   }
+
+  List<Message> get messageObjectList => messageList;
 
   List? get getMessages => messages;
 }

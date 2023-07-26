@@ -15,6 +15,9 @@ Map userModelToJson({required User message}) {
     'password': message.password,
     'name': message.name,
     'uid': message.uid,
+    'chatPersons': message.chatPersons,
+    'profilePic': message.profilePic,
+    'userIndex': message.userIndex,
   };
   return a;
 }
@@ -24,11 +27,15 @@ class User {
   String email;
   String password;
   String uid;
-  List chat_persons;
+  String profilePic;
+  int userIndex;
+  List chatPersons;
   // String uid;
 
   User({
-    required this.chat_persons,
+    required this.profilePic,
+    required this.userIndex,
+    required this.chatPersons,
     required this.email,
     required this.name,
     required this.password,
@@ -36,10 +43,12 @@ class User {
   });
 
   factory User.fromJsonToUserModel({required Map jsonData}) {
-    List? a = jsonData['chat_persons'];
+    List? a = jsonData['chatPersons'];
 
     return User(
-      chat_persons: a ?? [],
+      userIndex: jsonData['userIndex'],
+      profilePic: jsonData['profilePic'] ?? '',
+      chatPersons: a ?? [],
       email: jsonData['email'] ?? "",
       name: jsonData['name'] ?? "",
       password: jsonData['password'] ?? "",

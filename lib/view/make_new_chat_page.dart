@@ -23,9 +23,17 @@ class MakeNewChat extends StatelessWidget {
                 onTap: () => Navigator.popAndPushNamed(
                     context, "/show_messages",
                     arguments: {'user': ls[index].name, 'newChat': true}),
-                title: Text(ls[index].name),
+                title: Text(
+                  ls[index].name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text(ls[index].email),
-                leading: const Icon(Icons.account_circle_outlined),
+                leading: const CircleAvatar(
+                    radius: 28,
+                    child: Icon(
+                      Icons.account_circle,
+                      size: 50,
+                    )),
               );
             },
             separatorBuilder: (context, index) => const Divider(),

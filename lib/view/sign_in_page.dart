@@ -108,7 +108,8 @@ class SignIn extends StatelessWidget {
                               Future.delayed(
                                 const Duration(seconds: 1),
                                 () => Navigator.pushReplacementNamed(
-                                    context, "/chats",arguments: {'userData': ls}),
+                                    context, "/chats",
+                                    arguments: {'userData': ls}),
                               );
                             } else {
                               value.changeLoadingState = false;
@@ -131,16 +132,17 @@ class SignIn extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () => Navigator.pushReplacementNamed(
-                                context, "/sign_up",arguments: {'userData': ls}),
+                                context, "/sign_up",
+                                arguments: {'userData': ls}),
                             child: const Text(
                               "Sign up",
                               style:
                                   TextStyle(color: Colors.blue, fontSize: 15),
                             ),
                           ),
-                          const Text(
+                           Text(
                             " Now ",
-                            style: TextStyle(color: Colors.black, fontSize: 15),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
                       )
